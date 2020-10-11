@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class TankShooting : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class TankShooting : MonoBehaviour
     public float m_MinLaunchForce = 15f; 
     public float m_MaxLaunchForce = 30f; 
     public float m_MaxChargeTime = 0.75f;
-
+    public GameObject m_enemyTank;
     
     private string m_FireButton;         
     private float m_CurrentLaunchForce;  
@@ -86,8 +87,33 @@ public class TankShooting : MonoBehaviour
         // Create an instance of the shell and store a reference to it's rigidbody.
         Rigidbody shellInstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
 
+        // we don't care about the y-component(height) of the initial and target position.
+        Vector3 projectileXZPos = new Vector3(m_FireTransform.position.x, 0.0f, m_FireTransform.position.z);
+        Vector3 targetXZPos = new Vector3(m_enemyTank.transform.position.x, 0.0f, m_enemyTank.transform.position.z);
+
+        // rotate the object to face the target
+        transform.LookAt(targetXZPos);
+
+        // shorthands for the formula
+        float R = Vector3.Distance(projectileXZPos, targetXZPos);
+        float G = Physics.gravity.y;
+
+        float v = 150.0f;
+        float raiz = (float)Math.Sqrt((v * v * v * v) - G * ((targetXZPos.x * targetXZPos.x) + (2 * targetXZPos.y * (v * v))));
+        float angle = ((v*v) + raiz) / (G * targetXZPos.x);
+        float tanAlpha = Mathf.Tan(angle * Mathf.Deg2Rad);
+        float H = m_FireTransform.position.y - transform.position.y;
+
         // Set the shell's velocity to the launch force in the fire position's forward direction.
-        shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward; ;
+        float Vz = Mathf.Sqrt(G * R * R / (2.0f * (H - R * tanAlpha)));
+        float Vy = tanAlpha * Vz;
+
+        Vector3 localVelocity = new Vector3(0f, Vy, Vz);
+        Vector3 globalVelocity = transform.TransformDirection(localVelocity);
+
+        // launch the object by setting its initial velocity and flipping its state
+        shellInstance.velocity = globalVelocity;
+        //bTargetReady = false;
 
         // Change the clip to the firing clip and play it.
         m_ShootingAudio.clip = m_FireClip;
@@ -95,5 +121,7 @@ public class TankShooting : MonoBehaviour
 
         // Reset the launch force.  This is a precaution in case of missing button events.
         m_CurrentLaunchForce = m_MinLaunchForce;
+
+        
     }
 }
