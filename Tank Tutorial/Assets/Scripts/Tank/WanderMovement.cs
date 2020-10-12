@@ -19,7 +19,7 @@ public class WanderMovement : MonoBehaviour
     {
         // Choose the next destination point when the agent gets
         // close to the current one.
-        if (!agent.pathPending && agent.remainingDistance < 1.0f)
+        if (!agent.pathPending && agent.remainingDistance < 5.0f)
         {
             Vector3 current_position = transform.position; //Get current position
             agent.destination = Wander(current_position, 50.0f, 1);

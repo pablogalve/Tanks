@@ -15,7 +15,11 @@ public class TankShooting : MonoBehaviour
     public float m_MaxLaunchForce = 30f; 
     public float m_MaxChargeTime = 0.75f;
     public GameObject m_enemyTank;
-    
+    public GameObject turret;
+    public float angle;
+    public float distance;
+    public float G;
+
     private string m_FireButton;         
     private float m_CurrentLaunchForce;  
     private float m_ChargeSpeed;         
@@ -75,6 +79,8 @@ public class TankShooting : MonoBehaviour
             // ... launch the shell.
             Fire();
         }
+
+        turret.transform.LookAt(m_enemyTank.transform.position);
     }
 
 
@@ -96,12 +102,17 @@ public class TankShooting : MonoBehaviour
 
         // shorthands for the formula
         float R = Vector3.Distance(projectileXZPos, targetXZPos);
-        float G = Physics.gravity.y;
+        G = Physics.gravity.y;
 
-        float v = 150.0f;
-        float raiz = (float)Math.Sqrt((v * v * v * v) - G * ((targetXZPos.x * targetXZPos.x) + (2 * targetXZPos.y * (v * v))));
-        float angle = ((v*v) + raiz) / (G * targetXZPos.x);
-        float tanAlpha = Mathf.Tan(angle * Mathf.Deg2Rad);
+        //float v = 100.0f;
+        //float raiz = (float)Math.Sqrt((v * v * v * v) - G * ((targetXZPos.x * targetXZPos.x) + (2 * targetXZPos.y * (v * v))));
+        //float angle = ((v*v) + raiz) / (G * targetXZPos.x);
+
+        //distance = Vector3.Distance(m_enemyTank.transform.position, m_FireTransform.transform.position);
+
+        //angle = (1.0f / 2.0f) * (float)Mathf.Asin((G*distance)/(v*v));
+        //angle = angle * Mathf.Rad2Deg;
+        float tanAlpha = Mathf.Tan(30 * Mathf.Deg2Rad);
         float H = m_FireTransform.position.y - transform.position.y;
 
         // Set the shell's velocity to the launch force in the fire position's forward direction.
@@ -124,4 +135,5 @@ public class TankShooting : MonoBehaviour
 
         
     }
+
 }
