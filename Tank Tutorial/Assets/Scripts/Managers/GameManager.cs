@@ -9,8 +9,9 @@ public class GameManager : MonoBehaviour
     public float m_StartDelay = 3f;         
     public float m_EndDelay = 3f;           
     public CameraControl m_CameraControl;   
-    public Text m_MessageText;              
-    public GameObject m_TankPrefab;         
+    public Text m_MessageText;        
+    public GameObject m_RedTank;
+    public GameObject m_BlueTank;
     public TankManager[] m_Tanks;           
 
 
@@ -35,13 +36,14 @@ public class GameManager : MonoBehaviour
 
     private void SpawnAllTanks()
     {
-        for (int i = 0; i < m_Tanks.Length; i++)
-        {
-            m_Tanks[i].m_Instance =
-                Instantiate(m_TankPrefab, m_Tanks[i].m_SpawnPoint.position, m_Tanks[i].m_SpawnPoint.rotation) as GameObject;
-            m_Tanks[i].m_PlayerNumber = i + 1;
-            m_Tanks[i].Setup();
-        }
+        m_Tanks[0].m_Instance = Instantiate(m_RedTank, m_Tanks[0].m_SpawnPoint.position, m_Tanks[0].m_SpawnPoint.rotation) as GameObject;
+        m_Tanks[0].m_PlayerNumber = 1;
+        m_Tanks[0].Setup();
+
+        m_Tanks[1].m_Instance = Instantiate(m_BlueTank, m_Tanks[1].m_SpawnPoint.position, m_Tanks[1].m_SpawnPoint.rotation) as GameObject;
+        m_Tanks[1].m_PlayerNumber = 2;
+        m_Tanks[1].Setup();
+
     }
 
 

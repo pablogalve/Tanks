@@ -5,9 +5,9 @@ using System.Collections;
 public class Patrol : MonoBehaviour {
 
     public Transform[] points;
+    public GameObject[] waypoints;
     private int destPoint = 0;
     private NavMeshAgent agent;
-
 
     void Start () {
         agent = GetComponent<NavMeshAgent>();
@@ -16,6 +16,12 @@ public class Patrol : MonoBehaviour {
         // between points (ie, the agent doesn't slow down as it
         // approaches a destination point).
         agent.autoBraking = false;
+
+        for (int i = 0; i < points.Length; i++)
+        {
+            waypoints[i] = GameObject.FindGameObjectsWithTag("waypoint")[i];
+            points[i] = waypoints[i].transform;
+        }
 
         GotoNextPoint();
     }

@@ -38,6 +38,17 @@ public class TankShooting : MonoBehaviour
         m_FireButton = "Fire" + m_PlayerNumber;
 
         m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
+
+        if(m_PlayerNumber == 1)//PlayerNumber 1 is Red Tank 
+        {
+            m_enemyTank = GameObject.FindGameObjectWithTag("bluetank");
+        }
+        else if(m_PlayerNumber == 2)//PlayerNumber 1 is Blue Tank 
+        {
+            m_enemyTank = GameObject.FindGameObjectWithTag("redtank");
+        }
+       
+ 
     }
     
 
