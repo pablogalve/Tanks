@@ -34,7 +34,7 @@ public class WanderMovement : MonoBehaviour
         previousPosition = transform.position;
 
         //If tanks gets stucked, set another destination
-        if(currentSpeed <= targetSpeed * 0.1f)
+        if(currentSpeed <= targetSpeed * 0.35f)
         {
             SetNewDestination(200.0f);
         }

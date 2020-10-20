@@ -16,13 +16,15 @@ public class TankShooting : MonoBehaviour
     public float m_MaxChargeTime = 0.75f;
     public GameObject m_enemyTank;
     public GameObject turret;
-    public float angle;
     public float distance;
-    public float G;
+    public float m_InitialShellSpeed = 1000.0f;
 
+    private float fireRate = 0.0f;
+    private float nextFire = 0.0f;
     private string m_FireButton;         
     private float m_CurrentLaunchForce;  
-    private float m_ChargeSpeed;         
+    private float m_ChargeSpeed;
+    private float m_MinDistance = 0.0f;
     private bool m_Fired;                
 
 
@@ -35,6 +37,9 @@ public class TankShooting : MonoBehaviour
 
     private void Start()
     {
+        m_MinDistance = UnityEngine.Random.Range(35.0f, 45.0f);
+        fireRate = UnityEngine.Random.Range(2.0f, 6.0f);
+
         m_FireButton = "Fire" + m_PlayerNumber;
 
         m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
@@ -47,13 +52,27 @@ public class TankShooting : MonoBehaviour
         {
             m_enemyTank = GameObject.FindGameObjectWithTag("redtank");
         }
-       
  
     }
     
 
     private void Update()
     {
+        distance = Vector3.Distance(m_enemyTank.transform.position, transform.position);
+
+        turret.transform.LookAt(m_enemyTank.transform.position);
+
+        if (distance < m_MinDistance) 
+        {
+            if (Time.time > nextFire)
+            {
+                nextFire = Time.time + fireRate;
+                Fire();
+            }
+            
+        }
+        
+
         // Track the current state of the fire button and make decisions based on the current launch force.
         // The slider should have a default value of the minimum launch force.
         m_AimSlider.value = m_MinLaunchForce;
@@ -91,60 +110,31 @@ public class TankShooting : MonoBehaviour
             Fire();
         }
 
-        turret.transform.LookAt(m_enemyTank.transform.position);
+        
     }
-
 
     private void Fire()
     {
-        // Instantiate and launch the shell.
         // Set the fired flag so only Fire is only called once.
         m_Fired = true;
 
+        float angle = 0.5f * Mathf.Asin((-Physics.gravity.y * distance) / (m_InitialShellSpeed * m_InitialShellSpeed));
+        angle = angle * Mathf.Rad2Deg;
+
+        m_FireTransform.localRotation = Quaternion.identity;
+        m_FireTransform.localRotation = Quaternion.Euler(-angle, 0, 0);
+
         // Create an instance of the shell and store a reference to it's rigidbody.
-        Rigidbody shellInstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
-
-        // we don't care about the y-component(height) of the initial and target position.
-        Vector3 projectileXZPos = new Vector3(m_FireTransform.position.x, 0.0f, m_FireTransform.position.z);
-        Vector3 targetXZPos = new Vector3(m_enemyTank.transform.position.x, 0.0f, m_enemyTank.transform.position.z);
-
-        // rotate the object to face the target
-        transform.LookAt(targetXZPos);
-
-        // shorthands for the formula
-        float R = Vector3.Distance(projectileXZPos, targetXZPos);
-        G = Physics.gravity.y;
-
-        //float v = 100.0f;
-        //float raiz = (float)Math.Sqrt((v * v * v * v) - G * ((targetXZPos.x * targetXZPos.x) + (2 * targetXZPos.y * (v * v))));
-        //float angle = ((v*v) + raiz) / (G * targetXZPos.x);
-
-        //distance = Vector3.Distance(m_enemyTank.transform.position, m_FireTransform.transform.position);
-
-        //angle = (1.0f / 2.0f) * (float)Mathf.Asin((G*distance)/(v*v));
-        //angle = angle * Mathf.Rad2Deg;
-        float tanAlpha = Mathf.Tan(30 * Mathf.Deg2Rad);
-        float H = m_FireTransform.position.y - transform.position.y;
+        Rigidbody shellInstance =
+            Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
 
         // Set the shell's velocity to the launch force in the fire position's forward direction.
-        float Vz = Mathf.Sqrt(G * R * R / (2.0f * (H - R * tanAlpha)));
-        float Vy = tanAlpha * Vz;
-
-        Vector3 localVelocity = new Vector3(0f, Vy, Vz);
-        Vector3 globalVelocity = transform.TransformDirection(localVelocity);
-
-        // launch the object by setting its initial velocity and flipping its state
-        shellInstance.velocity = globalVelocity;
-        //bTargetReady = false;
+        shellInstance.velocity = m_InitialShellSpeed * m_FireTransform.forward;
 
         // Change the clip to the firing clip and play it.
         m_ShootingAudio.clip = m_FireClip;
         m_ShootingAudio.Play();
 
-        // Reset the launch force.  This is a precaution in case of missing button events.
-        m_CurrentLaunchForce = m_MinLaunchForce;
-
-        
     }
 
 }
