@@ -14,13 +14,13 @@ public class TankShooting : MonoBehaviour
     public float m_MinLaunchForce = 15f; 
     public float m_MaxLaunchForce = 30f; 
     public float m_MaxChargeTime = 0.75f;
-    public GameObject m_enemyTank;
-    public GameObject turret;
-    public float distance;
+    public GameObject m_EnemyTank;
+    public GameObject m_Turret;
+    public float m_Distance;
     public float m_InitialShellSpeed = 1000.0f;
 
-    private float fireRate = 0.0f;
-    private float nextFire = 0.0f;
+    private float m_FireRate = 0.0f;
+    private float m_NextFire = 0.0f;
     private string m_FireButton;         
     private float m_CurrentLaunchForce;  
     private float m_ChargeSpeed;
@@ -38,7 +38,7 @@ public class TankShooting : MonoBehaviour
     private void Start()
     {
         m_MinDistance = UnityEngine.Random.Range(35.0f, 45.0f);
-        fireRate = UnityEngine.Random.Range(2.0f, 6.0f);
+        m_FireRate = UnityEngine.Random.Range(2.0f, 6.0f);
 
         m_FireButton = "Fire" + m_PlayerNumber;
 
@@ -46,11 +46,11 @@ public class TankShooting : MonoBehaviour
 
         if(m_PlayerNumber == 1)//PlayerNumber 1 is Red Tank 
         {
-            m_enemyTank = GameObject.FindGameObjectWithTag("bluetank");
+            m_EnemyTank = GameObject.FindGameObjectWithTag("bluetank");
         }
         else if(m_PlayerNumber == 2)//PlayerNumber 1 is Blue Tank 
         {
-            m_enemyTank = GameObject.FindGameObjectWithTag("redtank");
+            m_EnemyTank = GameObject.FindGameObjectWithTag("redtank");
         }
  
     }
@@ -58,15 +58,15 @@ public class TankShooting : MonoBehaviour
 
     private void Update()
     {
-        distance = Vector3.Distance(m_enemyTank.transform.position, transform.position);
+        m_Distance = Vector3.Distance(m_EnemyTank.transform.position, transform.position);
 
-        turret.transform.LookAt(m_enemyTank.transform.position);
+        m_Turret.transform.LookAt(m_EnemyTank.transform.position);
 
-        if (distance < m_MinDistance) 
+        if (m_Distance < m_MinDistance) 
         {
-            if (Time.time > nextFire)
+            if (Time.time > m_NextFire)
             {
-                nextFire = Time.time + fireRate;
+                m_NextFire = Time.time + m_FireRate;
                 Fire();
             }
             
@@ -118,7 +118,7 @@ public class TankShooting : MonoBehaviour
         // Set the fired flag so only Fire is only called once.
         m_Fired = true;
 
-        float angle = 0.5f * Mathf.Asin((-Physics.gravity.y * distance) / (m_InitialShellSpeed * m_InitialShellSpeed));
+        float angle = 0.5f * Mathf.Asin((-Physics.gravity.y * m_Distance) / (m_InitialShellSpeed * m_InitialShellSpeed));
         angle = angle * Mathf.Rad2Deg;
 
         m_FireTransform.localRotation = Quaternion.identity;
