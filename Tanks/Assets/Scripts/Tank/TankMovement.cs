@@ -94,11 +94,18 @@ public class TankMovement : MonoBehaviour
 
     public void GoToBase(){
         //Stop patrol() and wander()
-        hasShells = false;        
+        hasShells = false;
 
         //Go To base position
-        agent.destination = bases[0].transform.position;
-
+        if (tankShooting.m_PlayerNumber == 1)
+        {
+            agent.destination = bases[1].transform.position;
+        }
+        else if(tankShooting.m_PlayerNumber == 2)
+        {
+            agent.destination = bases[0].transform.position;
+        }
+        
         // Check if we've reached the destination
         if(!agent.pathPending){
             if(agent.remainingDistance <= 1){
