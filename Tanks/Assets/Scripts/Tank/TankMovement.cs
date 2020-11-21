@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 
 public class TankMovement : MonoBehaviour
 {
@@ -18,12 +19,16 @@ public class TankMovement : MonoBehaviour
     private float m_TurnInputValue;
     private float m_OriginalPitch;
 
+    public bool hasShells = true;
+    private NavMeshAgent agent;
+    private GameObject[] bases;
+    TankShooting tankShooting;
+
     private void Awake()
     {
-        m_Rigidbody = GetComponent<Rigidbody>();
-
+        agent = GetComponent<NavMeshAgent>();
+        m_Rigidbody = GetComponent<Rigidbody>();        
     }
-
 
     private void OnEnable()
     {
@@ -32,21 +37,23 @@ public class TankMovement : MonoBehaviour
         m_TurnInputValue = 0f;
     }
 
-
     private void OnDisable()
     {
         m_Rigidbody.isKinematic = true;
     }
 
-
     private void Start()
     {
+        tankShooting = GetComponent<TankShooting>();
+
         m_MovementAxisName = "Vertical" + m_PlayerNumber;
         m_TurnAxisName = "Horizontal" + m_PlayerNumber;
 
         m_OriginalPitch = m_MovementAudio.pitch;
-    }
 
+        if (bases == null)
+            bases = GameObject.FindGameObjectsWithTag("Respawn");
+    }
 
     private void Update()
     {
@@ -56,7 +63,6 @@ public class TankMovement : MonoBehaviour
 
         EngineAudio();
     }
-
 
     private void EngineAudio()
     {
@@ -82,6 +88,22 @@ public class TankMovement : MonoBehaviour
                 m_MovementAudio.clip = m_EngineDriving;
                 m_MovementAudio.pitch = Random.Range(m_OriginalPitch - m_PitchRange, m_OriginalPitch + m_PitchRange);
                 m_MovementAudio.Play();
+            }
+        }
+    }
+
+    public void GoToBase(){
+        //Stop patrol() and wander()
+        hasShells = false;        
+
+        //Go To base position
+        agent.destination = bases[0].transform.position;
+
+        // Check if we've reached the destination
+        if(!agent.pathPending){
+            if(agent.remainingDistance <= 1){
+                hasShells = true;
+                tankShooting.shell_num += tankShooting.shell_recharge;
             }
         }
     }

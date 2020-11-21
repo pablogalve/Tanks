@@ -18,6 +18,8 @@ public class TankShooting : MonoBehaviour
     public GameObject m_Turret;
     public float m_Distance;
     public float m_InitialShellSpeed = 1000.0f;
+    public int shell_num = 2;
+    public int shell_recharge = 2;
 
     private float m_FireRate = 0.0f;
     private float m_NextFire = 0.0f;
@@ -27,6 +29,7 @@ public class TankShooting : MonoBehaviour
     private float m_MinDistance = 0.0f;
     private bool m_Fired;
 
+    TankMovement tankMovement;
 
     private void OnEnable()
     {
@@ -37,6 +40,8 @@ public class TankShooting : MonoBehaviour
 
     private void Start()
     {
+        tankMovement = GetComponent<TankMovement>();
+
         m_MinDistance = UnityEngine.Random.Range(35.0f, 45.0f);
         m_FireRate = UnityEngine.Random.Range(2.0f, 6.0f);
 
@@ -60,7 +65,7 @@ public class TankShooting : MonoBehaviour
 
         m_Turret.transform.LookAt(m_EnemyTank.transform.position);
 
-        if (m_Distance < m_MinDistance)
+        if (m_Distance < m_MinDistance )
         {
             if (Time.time > m_NextFire)
             {
@@ -80,30 +85,37 @@ public class TankShooting : MonoBehaviour
             m_CurrentLaunchForce = m_MaxLaunchForce;
             Fire();
         }
+
+        if(shell_num <= 0){
+            //Return to base to recharge
+            tankMovement.GoToBase();
+        }
     }
 
     private void Fire()
     {
-        // Set the fired flag so only Fire is only called once.
-        m_Fired = true;
+        if(shell_num > 0){
+            shell_num--;
 
-        float angle = 0.5f * Mathf.Asin((-Physics.gravity.y * m_Distance) / (m_InitialShellSpeed * m_InitialShellSpeed));
-        angle = angle * Mathf.Rad2Deg;
+            // Set the fired flag so only Fire is only called once.
+            m_Fired = true;
 
-        m_FireTransform.localRotation = Quaternion.identity;
-        m_FireTransform.localRotation = Quaternion.Euler(-angle, 0, 0);
+            float angle = 0.5f * Mathf.Asin((-Physics.gravity.y * m_Distance) / (m_InitialShellSpeed * m_InitialShellSpeed));
+            angle = angle * Mathf.Rad2Deg;
 
-        // Create an instance of the shell and store a reference to it's rigidbody.
-        Rigidbody shellInstance =
-            Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
+            m_FireTransform.localRotation = Quaternion.identity;
+            m_FireTransform.localRotation = Quaternion.Euler(-angle, 0, 0);
 
-        // Set the shell's velocity to the launch force in the fire position's forward direction.
-        shellInstance.velocity = m_InitialShellSpeed * m_FireTransform.forward;
+            // Create an instance of the shell and store a reference to it's rigidbody.
+            Rigidbody shellInstance =
+                Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
 
-        // Change the clip to the firing clip and play it.
-        m_ShootingAudio.clip = m_FireClip;
-        m_ShootingAudio.Play();
+            // Set the shell's velocity to the launch force in the fire position's forward direction.
+            shellInstance.velocity = m_InitialShellSpeed * m_FireTransform.forward;
 
+            // Change the clip to the firing clip and play it.
+            m_ShootingAudio.clip = m_FireClip;
+            m_ShootingAudio.Play();
+        } 
     }
-
 }

@@ -9,8 +9,11 @@ public class Patrol : MonoBehaviour {
     private int destPoint = 0;
     private NavMeshAgent agent;
 
+    TankMovement tankMovement;
+
     void Start () {
         agent = GetComponent<NavMeshAgent>();
+        tankMovement = GetComponent<TankMovement>();
 
         // Disabling auto-braking allows for continuous movement
         // between points (ie, the agent doesn't slow down as it
@@ -22,14 +25,17 @@ public class Patrol : MonoBehaviour {
             waypoints[i] = GameObject.FindGameObjectsWithTag("waypoint")[i];
             points[i] = waypoints[i].transform;
         }
-
-        GotoNextPoint();
+        if(tankMovement.hasShells == true)
+            GotoNextPoint();
+        else{
+            tankMovement.GoToBase();
+        }   
     }
 
     void Update () {
         // Choose the next destination point when the agent gets
         // close to the current one.
-        if (!agent.pathPending && agent.remainingDistance < 0.5f)
+        if (!agent.pathPending && agent.remainingDistance < 0.5f && tankMovement.hasShells)
             GotoNextPoint();
     }
 

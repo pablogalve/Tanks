@@ -10,12 +10,15 @@ public class WanderMovement : MonoBehaviour
     public float currentSpeed;
     public float targetSpeed;
 
+    TankMovement tankMovement;
+
     // Start is called before the first frame update
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         agent.autoBraking = false;
         targetSpeed = GetComponent<NavMeshAgent>().speed;
+        tankMovement = GetComponent<TankMovement>();
     }
 
     // Update is called once per frame
@@ -23,7 +26,7 @@ public class WanderMovement : MonoBehaviour
     {
         // Choose the next destination point when the agent gets
         // close to the current one.
-        if (!agent.pathPending && agent.remainingDistance < 0.5f)
+        if (!agent.pathPending && agent.remainingDistance < 0.5f && tankMovement.hasShells)
         {
             SetNewDestination(50.0f);
         }
