@@ -102,7 +102,7 @@ public class TankShooting : MonoBehaviour
 
             float angle = 0.5f * Mathf.Asin((-Physics.gravity.y * m_Distance) / (m_InitialShellSpeed * m_InitialShellSpeed));
             angle = angle * Mathf.Rad2Deg;
-
+            
             m_FireTransform.localRotation = Quaternion.identity;
             m_FireTransform.localRotation = Quaternion.Euler(-angle, 0, 0);
 
