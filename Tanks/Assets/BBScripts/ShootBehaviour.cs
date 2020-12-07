@@ -121,12 +121,6 @@ public class ShootBehaviour : BBUnity.Actions.GOAction
             Fire();
         }
 
-        if (shell_num <= 0)
-        {
-            //Return to base to recharge
-            tankMovement.GoToBase();
-        }
-
         return TaskStatus.COMPLETED;
 
     } // OnUpdate

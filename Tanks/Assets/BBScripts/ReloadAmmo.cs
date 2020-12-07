@@ -19,15 +19,11 @@ public class ReloadAmmo : BBUnity.Actions.GOAction
     [InParam("Tank")]
     public GameObject Tank;
 
-    private Vector3 previousPosition;
-    public float currentSpeed;
-    public float targetSpeed;
-
     TankMovement tankMovement;
 
     public override TaskStatus OnLatentStart()
     {
-       
+        tankMovement = Tank.GetComponent<TankMovement>();
 
         return base.OnLatentStart();
     }
@@ -35,7 +31,7 @@ public class ReloadAmmo : BBUnity.Actions.GOAction
     // Main class method, invoked by the execution engine.
     public override TaskStatus OnUpdate()
     {
-        
+        tankMovement.GoToBase();
 
         return TaskStatus.COMPLETED;
 

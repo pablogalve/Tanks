@@ -18,18 +18,18 @@ public class PatrollingBehaviour : BBUnity.Actions.GOAction
     [InParam("Tank")]
     public GameObject Tank;
 
-    private Transform[] points = new Transform[7];
-    private GameObject[] waypoints = new GameObject[7];
+    private Transform[] points = new Transform[6];
+    private GameObject[] waypoints = new GameObject[6];
     private int destPoint = 0;
 
     TankMovement tankMovement;
 
-    public override TaskStatus OnLatentStart()
+    public override void OnStart()
     {
         agent = agent.GetComponent<NavMeshAgent>();
         tankMovement = Tank.GetComponent<TankMovement>();
         agent.autoBraking = false;
-        
+
         for (int i = 0; i < points.Length; i++)
         {
             waypoints[i] = GameObject.FindGameObjectsWithTag("waypoint")[i];
@@ -42,7 +42,7 @@ public class PatrollingBehaviour : BBUnity.Actions.GOAction
             tankMovement.GoToBase();
         }
 
-        return base.OnLatentStart();
+        base.OnStart();
     }
 
     // Main class method, invoked by the execution engine.
@@ -69,7 +69,6 @@ public class PatrollingBehaviour : BBUnity.Actions.GOAction
         // Set the agent to go to the currently selected destination.
         agent.destination = points[destPoint].position;
 
-        Debug.Log(points[destPoint].position);
         // Choose the next point in the array as the destination,
         // cycling to the start if necessary.
         destPoint = (destPoint + 1) % points.Length;
