@@ -13,11 +13,11 @@ public class ShootBehaviour : BBUnity.Actions.GOAction
     [InParam("Tank")]
     public GameObject Tank;
 
+    [InParam("Enemy Tank")]
+    public GameObject m_EnemyTank;
+
     [InParam("Shell")]
     public Rigidbody m_Shell;
-
-    [InParam("Player Number")]
-    public int m_PlayerNumber = 1;
 
     [InParam("Fire Transform")]
     public Transform m_FireTransform;
@@ -58,7 +58,6 @@ public class ShootBehaviour : BBUnity.Actions.GOAction
     [InParam("Shell Recharge")]
     public int shell_recharge = 2;
 
-    private GameObject m_EnemyTank;
     private float m_FireRate = 0.0f;
     private float m_NextFire = 0.0f;
     private string m_FireButton;
@@ -76,18 +75,7 @@ public class ShootBehaviour : BBUnity.Actions.GOAction
         m_MinDistance = UnityEngine.Random.Range(35.0f, 45.0f);
         m_FireRate = UnityEngine.Random.Range(2.0f, 6.0f);
 
-        m_FireButton = "Fire" + m_PlayerNumber;
-
-        m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
-
-        if (m_PlayerNumber == 1)//PlayerNumber 1 is Red Tank 
-        {
-            m_EnemyTank = GameObject.FindGameObjectWithTag("bluetank");
-        }
-        else if (m_PlayerNumber == 2)//PlayerNumber 1 is Blue Tank 
-        {
-            m_EnemyTank = GameObject.FindGameObjectWithTag("redtank");
-        }
+        m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;        
 
         return base.OnLatentStart();
     }
@@ -100,14 +88,12 @@ public class ShootBehaviour : BBUnity.Actions.GOAction
 
         m_Turret.transform.LookAt(m_EnemyTank.transform.position);
 
-        if (m_Distance < m_MinDistance)
-        {
-            if (Time.time > m_NextFire)
-            {
-                m_NextFire = Time.time + m_FireRate;
-                Fire();
-            }
-        }
+         if (Time.time > m_NextFire)
+         {
+            m_NextFire = Time.time + m_FireRate;
+            Fire();
+         }
+        
 
         // Track the current state of the fire button and make decisions based on the current launch force.
         // The slider should have a default value of the minimum launch force.

@@ -10,7 +10,7 @@ using Pada1.BBCore.Framework; // BasePrimitiveAction
 [Help("Clone a 'bullet' and shoots it through the Forward axis with the " +
       "specified velocity.")]
 
-public class PatrollingBehaviour : BBUnity.Actions.GOAction
+public class Patrolling : BBUnity.Actions.GOAction
 {
     [InParam("Navmesh")]
     public NavMeshAgent agent;
@@ -18,61 +18,36 @@ public class PatrollingBehaviour : BBUnity.Actions.GOAction
     [InParam("Tank")]
     public GameObject Tank;
 
-    private Transform[] points = new Transform[6];
-    private GameObject[] waypoints = new GameObject[6];
-    private int destPoint = 0;
+    [InParam("Ghost")]
+    public GameObject[] Ghost;
 
+    private Transform[] points;
+    private GameObject[] waypoints;
+    private int destPoint = 0;
+    private bool SetPoints = true;
     TankMovement tankMovement;
 
-    public override void OnStart()
-    {
-        agent = agent.GetComponent<NavMeshAgent>();
-        tankMovement = Tank.GetComponent<TankMovement>();
-        agent.autoBraking = false;
-
-        for (int i = 0; i < points.Length; i++)
-        {
-            waypoints[i] = GameObject.FindGameObjectsWithTag("waypoint")[i];
-            points[i] = waypoints[i].transform;
-        }
-        if (tankMovement.hasShells == true)
-            GotoNextPoint();
-        else
-        {
-            tankMovement.GoToBase();
-        }
-
-        base.OnStart();
-    }
 
     // Main class method, invoked by the execution engine.
     public override TaskStatus OnUpdate()
     {
+        agent = agent.GetComponent<NavMeshAgent>();
+        tankMovement = Tank.GetComponent<TankMovement>();
+        Ghost = GameObject.FindGameObjectsWithTag("ghost");
+        agent.autoBraking = false;
 
         // Choose the next destination point when the agent gets
         // close to the current one.
-        if (!agent.pathPending && agent.remainingDistance < 0.5f && tankMovement.hasShells)
+        if (tankMovement.hasShells)
             GotoNextPoint();
 
-        Debug.Log(tankMovement.hasShells);
-        Debug.Log(agent.remainingDistance);
         return TaskStatus.COMPLETED;
 
     } // OnUpdate
 
     void GotoNextPoint()
     {
-        // Returns if no points have been set up
-        if (points.Length == 0)
-            return;
-
-        // Set the agent to go to the currently selected destination.
-        agent.destination = points[destPoint].position;
-
-        // Choose the next point in the array as the destination,
-        // cycling to the start if necessary.
-        destPoint = (destPoint + 1) % points.Length;
-
+        agent.destination = Ghost[0].transform.position;
     }
 
 } // class PatrollingBehaviour
